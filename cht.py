@@ -2,7 +2,7 @@ import streamlit as st
 import folium
 from folium.plugins import MarkerCluster
 from streamlit_option_menu import option_menu
-from streamlit_folium import folium_static
+from streamlit_folium import st_folium  # ✅ Updated import
 from datetime import datetime, date
 import pandas as pd
 import os
@@ -10,12 +10,7 @@ import re, base64
 from PIL import Image
 
 # Sidebar navigation 🚕
-#logo = Image.open("images/acs_logo-removebg-preview.png")
-
-# Create a horizontal layout with two columns for the logo and title
 with st.sidebar:
-    
-    # Now the option menu
     selected = option_menu(
         menu_title='Anaman Concierge Services',
         options=['Home', 'View Locations', 'Contact Us'],
@@ -42,7 +37,7 @@ close_to_uihc_hotels = [
 locations = {
     "Iowa City": {
         "hotels": [
-            {"name": "Courtyard Iowa City University Heights", "lat": 41.65635, "lon": -91.55153}, #41.65722334145281, -91.53383168018051
+            {"name": "Courtyard Iowa City University Heights", "lat": 41.65635, "lon": -91.55153},
             {"name": "Element Iowa City", "lat": 41.65767, "lon": -91.53296},
             {"name": "Graduate by Hilton Iowa City", "lat": 41.65866, "lon": -91.53273},
             {"name": "Hilton Garden Inn Iowa City Downtown University", "lat": 41.65729, "lon": -91.53370},
@@ -149,10 +144,12 @@ def calculate_fare(hotel_suburb, hotel_name, hospital_suburb, hospital_name, num
 
     return base_fare
 
+# -------------------------------
+# HOME TAB
+# -------------------------------
 if selected == "Home":
     st.title("Hotel-Hospital Transportation Cost Calculator")
 
-    # Dropdowns for hotels
     st.header("Select Hotel")
     col1, col2 = st.columns(2)
     with col1:
@@ -161,7 +158,6 @@ if selected == "Home":
         hotel_names = [h["name"] for h in locations[hotel_suburb]["hotels"]]
         selected_hotel = st.selectbox("Hotel", hotel_names, key="hotel")
 
-    # Dropdowns for hospitals
     st.header("Select Hospital")
     col3, col4 = st.columns(2)
     with col3:
@@ -170,25 +166,18 @@ if selected == "Home":
         hospital_names = [h["name"] for h in locations[hospital_suburb]["hospitals"]]
         selected_hospital = st.selectbox("Hospital", hospital_names, key="hospital")
 
-    # Number of people and time input
     num_people = st.number_input("Number of People", min_value=1, value=1, step=1)
 
     st.header("Select Trip Date and Time")
     col5, col6 = st.columns(2)
-
     with col5:
         trip_date = st.date_input("Trip Date", value=date.today())
-
     with col6:
         if "trip_time" not in st.session_state:
             st.session_state.trip_time = datetime.now().time()
-        
         trip_time = st.time_input("Trip Time", key="trip_time")
 
     trip_datetime = datetime.combine(trip_date, trip_time)
-
-
-    # Calculate fare
     fare = calculate_fare(hotel_suburb, selected_hotel, hospital_suburb, selected_hospital, num_people, trip_datetime)
 
     if fare is not None:
@@ -201,10 +190,7 @@ if selected == "Home":
             """,
             unsafe_allow_html=True
         )
-    else:
-        st.error("Could not calculate fare for selected options.")
 
-    # Show map
     st.header("Map of Hotels and Hospitals")
     m = folium.Map(location=[41.6611, -91.5300], zoom_start=12)
     hotel_cluster = MarkerCluster(name="Hotels").add_to(m)
@@ -225,9 +211,11 @@ if selected == "Home":
             ).add_to(hospital_cluster)
 
     folium.LayerControl().add_to(m)
-    folium_static(m)
+    st_folium(m, width=700, height=500)  # ✅ UPDATED CALL
 
-
+# -------------------------------
+# VIEW LOCATIONS TAB
+# -------------------------------
 if selected == "View Locations":
     with st.container():
         st.title("UI Hospital Locations")
@@ -265,8 +253,9 @@ if selected == "View Locations":
                     </div>
                 """, unsafe_allow_html=True)
 
-
-
+# -------------------------------
+# CONTACT US TAB
+# -------------------------------
 if selected == "Contact Us":
     st.title("Contact Us")
     st.markdown("""
