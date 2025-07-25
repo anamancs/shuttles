@@ -5,4 +5,3 @@ streamlit-option-menu
 streamlit_folium
 pillow
 requests
-BytesIO
