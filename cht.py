@@ -225,29 +225,31 @@ if selected == "View Locations":
             for hospital in data["hospitals"]
         ]
         col1, col2, col3 = st.columns(3)
+
         for idx, (suburb, hospital) in enumerate(hospitals):
             col = [col1, col2, col3][idx % 3]
             maps_url = f"https://www.google.com/maps/search/?api=1&query={hospital['lat']},{hospital['lon']}"
+
             sanitized_name = sanitize_name(hospital['name'])
             image_filename = sanitized_name + ".jpg"
-            image_path = f"anamancs/shuttles/{image_filename}"
+            image_path = os.path.join("shuttles", image_filename)  # 🔁 Fix path here
 
             with col:
                 if os.path.exists(image_path):
-                    image_html = f"<img src='data:image/jpeg;base64,{base64.b64encode(open(image_path, 'rb').read()).decode()}' style='width:100%; height:200px; object-fit:cover; border-radius:10px 10px 0 0;'/>"
+                    with open(image_path, 'rb') as img_file:
+                        encoded_img = base64.b64encode(img_file.read()).decode()
+                    image_html = f"<img src='data:image/jpeg;base64,{encoded_img}' style='width:100%; height:200px; object-fit:cover; border-radius:10px 10px 0 0;'/>"
                 else:
-                    image_html = ""
+                    image_html = "<div style='width:100%; height:200px; background:#eee; display:flex; align-items:center; justify-content:center;'>No image</div>"
 
                 st.markdown(f"""
                     <div style='width: 100%; max-width: 300px; height: 400px; border: 2px solid #ccc; border-radius: 12px; overflow: hidden; padding: 0; margin-bottom: 20px; background: #fff;'>
                         {image_html}
                         <div style='padding: 15px;'>
-                            <h5 style='margin-bottom: 5px;'>{hospital['name']}</h4>
+                            <h5 style='margin-bottom: 5px;'>{hospital['name']}</h5>
                             <p style='margin: 0;'>📍 Located in {suburb}</p>
                             <p style='margin: 5px 0;'>
-                                <a href='{maps_url}' target='_blank' style='color: blue; text-decoration: none;'>
-                                    ↗️ Get Directions
-                                </a>
+                                <a href='{maps_url}' target='_blank' style='color: blue; text-decoration: none;'>↗️ Get Directions</a>
                             </p>
                         </div>
                     </div>
