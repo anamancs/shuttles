@@ -2,3 +2,4 @@ streamlit
 folium
 pandas
 streamlit-option-menu
+streamlit_folium
