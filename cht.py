@@ -245,7 +245,7 @@ if selected == "View Locations":
 
                 st.markdown(f"""
                     <div style='padding: 15px;'>
-                        <h5 style='margin-bottom: 5px;'>{hospital['name']}</h4>
+                        <h5 style='margin-bottom: 5px;'>{hospital['name']}</h5>
                         <p style='margin: 0;'>📍 Located in {suburb}</p>
                         <p style='margin: 5px 0;'>
                             <a href='{maps_url}' target='_blank' style='color: blue; text-decoration: none;'>
