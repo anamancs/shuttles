@@ -230,7 +230,7 @@ if selected == "View Locations":
             maps_url = f"https://www.google.com/maps/search/?api=1&query={hospital['lat']},{hospital['lon']}"
             sanitized_name = sanitize_name(hospital['name'])
             image_filename = sanitized_name + ".jpg"
-            image_path = f"images/{image_filename}"
+            image_path = f"anamancs/shuttles/{image_filename}"
 
             with col:
                 if os.path.exists(image_path):
