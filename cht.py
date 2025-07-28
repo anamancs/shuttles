@@ -225,35 +225,34 @@ if selected == "View Locations":
             for hospital in data["hospitals"]
         ]
         col1, col2, col3 = st.columns(3)
-        raw_base_url = "https://raw.githubusercontent.com/anamancs/shuttles/main/"
-
         for idx, (suburb, hospital) in enumerate(hospitals):
             col = [col1, col2, col3][idx % 3]
             maps_url = f"https://www.google.com/maps/search/?api=1&query={hospital['lat']},{hospital['lon']}"
             sanitized_name = sanitize_name(hospital['name'])
             image_filename = sanitized_name + ".jpg"
-            image_url = raw_base_url + image_filename
+            image_path = f"images/{image_filename}"
 
             with col:
-                try:
-                    response = requests.get(image_url)
-                    response.raise_for_status()
-                    img = Image.open(BytesIO(response.content))
-                    st.image(img, caption=hospital['name'], use_column_width=True)
-                except Exception:
-                    st.write(f"Image not found for {hospital['name']}")
+                if os.path.exists(image_path):
+                    image_html = f"<img src='data:image/jpeg;base64,{base64.b64encode(open(image_path, 'rb').read()).decode()}' style='width:100%; height:200px; object-fit:cover; border-radius:10px 10px 0 0;'/>"
+                else:
+                    image_html = ""
 
                 st.markdown(f"""
-                    <div style='padding: 15px;'>
-                        <h5 style='margin-bottom: 5px;'>{hospital['name']}</h5>
-                        <p style='margin: 0;'>📍 Located in {suburb}</p>
-                        <p style='margin: 5px 0;'>
-                            <a href='{maps_url}' target='_blank' style='color: blue; text-decoration: none;'>
-                                ↗️ Get Directions
-                            </a>
-                        </p>
+                    <div style='width: 100%; max-width: 300px; height: 400px; border: 2px solid #ccc; border-radius: 12px; overflow: hidden; padding: 0; margin-bottom: 20px; background: #fff;'>
+                        {image_html}
+                        <div style='padding: 15px;'>
+                            <h5 style='margin-bottom: 5px;'>{hospital['name']}</h4>
+                            <p style='margin: 0;'>📍 Located in {suburb}</p>
+                            <p style='margin: 5px 0;'>
+                                <a href='{maps_url}' target='_blank' style='color: blue; text-decoration: none;'>
+                                    ↗️ Get Directions
+                                </a>
+                            </p>
+                        </div>
                     </div>
                 """, unsafe_allow_html=True)
+
 
 # -------------------------------
 # CONTACT US TAB
